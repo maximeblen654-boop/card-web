@@ -1,6 +1,6 @@
 # 卡网部署与本机演练
 
-这个私有仓库保存卡网的启动脚本、演练代码和 GitHub 云端构建流程。
+这个公开仓库保存卡网的启动脚本、演练代码和 GitHub 云端构建流程。
 商城核心使用 [Dujiao-Next v1.5.0](https://github.com/dujiao-next/dujiao-next/releases/tag/v1.5.0)，来源和版本固定在 `upstream.lock.json`。
 GitHub 构建时直接取该固定版本的官方源码，前后端全部在 GitHub 的 Ubuntu 机器上编译，不占用本机的编译缓存。
 
@@ -28,7 +28,7 @@ GitHub 构建时直接取该固定版本的官方源码，前后端全部在 Git
 - GitHub：保存经过筛选的代码、版本记录和云端编译流程。
 - 正式服务器：购买后部署商城，另行配置域名、防护、支付和供货。
 
-GitHub 代码托管及云端编译不能替代商城服务器。工作流使用标准 GitHub 托管 Ubuntu 机器，运行用量由账户的 Actions 额度及计费设置决定。
+GitHub 代码托管及云端编译不能替代商城服务器。工作流使用标准 GitHub 托管 Ubuntu 机器；公开仓库的标准 runner 编译分钟免费，安装包产物保留 3 天。参见 [GitHub 官方计费说明](https://docs.github.com/en/billing/concepts/product-billing/github-actions)。
 
 ## 上游许可
 
