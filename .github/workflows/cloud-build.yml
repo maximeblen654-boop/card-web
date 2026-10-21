@@ -1,0 +1,56 @@
+name: Cloud build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: card-shop-cloud-build
+  cancel-in-progress: false
+
+jobs:
+  linux-amd64:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout build instructions
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Read pinned upstream
+        id: source
+        run: |
+          node scripts/check-repository.mjs
+          node --input-type=module <<'JS'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const lock = JSON.parse(readFileSync('upstream.lock.json', 'utf8'));
+          appendFileSync(process.env.GITHUB_OUTPUT, `repository=${lock.repository}\ncommit=${lock.commit}\nnode=${lock.node_version}\npnpm=${lock.pnpm_version}\n`);
+          JS
+      - name: Checkout official source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: ${{ steps.source.outputs.repository }}
+          ref: ${{ steps.source.outputs.commit }}
+          path: upstream
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ steps.source.outputs.node }}
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa
+        with:
+          version: ${{ steps.source.outputs.pnpm }}
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff
+        with:
+          go-version-file: upstream/go.mod
+          cache: false
+      - name: Build storefront, admin and Linux server
+        run: bash scripts/build-linux.sh
+      - name: Keep installable package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: card-shop-linux-amd64
+          path: out/
+          retention-days: 3
+          if-no-files-found: error

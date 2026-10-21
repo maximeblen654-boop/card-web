@@ -1,0 +1,30 @@
+name: Repository checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.11.1'
+      - run: node scripts/check-repository.mjs
+      - run: bash -n scripts/build-linux.sh
+      - name: Parse PowerShell source
+        shell: pwsh
+        run: |
+          foreach ($file in Get-ChildItem local-shop/*.ps1) {
+            $tokens = $null; $parseErrors = $null
+            $null = [System.Management.Automation.Language.Parser]::ParseFile($file.FullName, [ref]$tokens, [ref]$parseErrors)
+            if ($parseErrors.Count) { throw "PowerShell parse failed: $($file.Name)" }
+          }

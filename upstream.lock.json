@@ -1,0 +1,14 @@
+{
+  "repository": "dujiao-next/dujiao-next",
+  "version": "v1.5.0",
+  "commit": "41b86260dc9a60269526057eed8d915844ceb3a3",
+  "node_version": "24.11.1",
+  "pnpm_version": "10.34.3",
+  "go_version_source": "go.mod",
+  "build_target": "linux/amd64",
+  "build_type": "custom",
+  "official_windows_asset": {
+    "url": "https://github.com/dujiao-next/dujiao-next/releases/download/v1.5.0/dujiao-next_v1.5.0_Windows_x86_64.zip",
+    "sha256": "8b46098e5bfcc248f7dc41b0f4d3e81567122781aa6e31460dfa2aa902c88145"
+  }
+}
