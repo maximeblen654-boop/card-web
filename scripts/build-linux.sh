@@ -10,6 +10,10 @@ source_root="$root/upstream"
 commit="$(node -p "require('./upstream.lock.json').commit")"
 version="$(node -p "require('./upstream.lock.json').version")"
 test "$(git -C "$source_root" rev-parse HEAD)" = "$commit"
+node "$root/scripts/apply-fixed-retail.mjs" "$source_root"
+node "$root/scripts/install-retail-test.mjs" "$source_root"
+# Fail before expensive frontend builds if the fixed-retail regression returns.
+(cd "$source_root" && go test ./internal/modules/catalog/mapping/application ./internal/modules/siteconnection/application)
 
 pnpm --dir "$source_root/frontend/admin" install --frozen-lockfile
 pnpm --dir "$source_root/frontend/user" install --frozen-lockfile
@@ -30,6 +34,8 @@ go build -mod=readonly -trimpath -tags=release,fullstack \
 cp LICENSE README.md config.yml.example "$package/"
 cp scripts/dujiao-next-manager.sh "$package/scripts/"
 cp "$root/upstream.lock.json" "$package/SOURCE.json"
+cp "$root/scripts/apply-fixed-retail.mjs" "$package/scripts/"
+cp "$root/scripts/install-retail-test.mjs" "$package/scripts/"
 cp "$root/upstream.lock.json" "$root/out/SOURCE.json"
 archive="dujiao-next_${version}_cloud_Linux_x86_64.tar.gz"
 tar -czf "$root/out/$archive" -C "$package" .
